@@ -24,8 +24,8 @@ const gameBeginning: Piece[][] = [
   [BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
   [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, BLACK_BISHOP, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, WHITE_BISHOP, EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
   [WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK]
@@ -72,6 +72,9 @@ function App() {
     }
     else if(piece.Type === Type.KNIGHT){
       possibilities = getPossibilitiesForKnight(piece, location);
+    }
+    else if(piece.Type === Type.BISHOP){
+      possibilities = getPossibilitiesForBishop(piece, location);
     }
 
     return possibilities;
@@ -165,6 +168,89 @@ function App() {
     });
 
     return locations;
+  }
+
+  const getPossibilitiesForBishop = (piece: Piece, location: Location) : Location[] => {
+    let possibilities: Location[] = [];
+
+    const y: number = location.row;
+    const x: number = location.collumn;
+    const color: Color = piece.Color;
+
+    for(let i = x+1; i < 8; i++){
+      let difference = i - x;
+
+      if(difference + x > 7 || difference + y > 7)
+        break;
+      const currentCell: Piece = board[difference + y][difference + x];
+      const currentLocation: Location = new Location(difference + y, difference + x);
+      if(currentCell.Color === color){
+        break;
+      }
+      else if(currentCell.Type !== Type.EMPTY){
+        possibilities.push(currentLocation);
+        break;
+      }
+      else{
+        possibilities.push(currentLocation);
+      }
+    }
+    for(let i = x+1; i < 8; i++){
+      let difference = i - x;
+
+      if(difference + x > 7 || y - difference < 0)
+        break;
+      const currentCell: Piece = board[y - difference][difference + x];
+      const currentLocation: Location = new Location(y - difference, difference + x);
+      if(currentCell.Color === color){
+        break;
+      }
+      else if(currentCell.Type !== Type.EMPTY){
+        possibilities.push(currentLocation);
+        break;
+      }
+      else{
+        possibilities.push(currentLocation);
+      }
+    }
+    for(let i = x-1; i >= 0; i--){
+      let difference = x - i;
+
+      if(x - difference < 0 || difference + y > 7)
+        break;
+      const currentCell: Piece = board[difference + y][x - difference];
+      const currentLocation: Location = new Location(difference + y, x - difference);
+      if(currentCell.Color === color){
+        break;
+      }
+      else if(currentCell.Type !== Type.EMPTY){
+        possibilities.push(currentLocation);
+        break;
+      }
+      else{
+        possibilities.push(currentLocation);
+      }
+    }
+    for(let i = x-1; i >= 0; i--){
+      let difference = x - i;
+
+      if(x - difference < 0 ||  y - difference < 0)
+        break;
+      const currentCell: Piece = board[y - difference][x - difference];
+      const currentLocation: Location = new Location(y - difference, x - difference);
+      if(currentCell.Color === color){
+        break;
+      }
+      else if(currentCell.Type !== Type.EMPTY){
+        possibilities.push(currentLocation);
+        break;
+      }
+      else{
+        possibilities.push(currentLocation);
+      }
+    }
+
+    return possibilities;
   }
 
   return (
