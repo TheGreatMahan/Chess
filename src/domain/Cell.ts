@@ -1,15 +1,15 @@
-export enum Cell{
-    EMPTY = 1,
-    PAWN = 2,
-    KNIGHT = 3,
-    BISHOP = 4,
-    ROOK = 5,
-    QUEEN = 6,
-    KING = 7
+export enum Type{
+    EMPTY = "EMPTY",
+    PAWN = "PAWN",
+    KNIGHT = "KNIGHT",
+    BISHOP = "BISHOP",
+    ROOK = "ROOK",
+    QUEEN = "QUEEN",
+    KING = "KING"
 }
 
 export enum Color{
-    EMPTY = 0,
-    BLACK = 1,
-    WHITE = 2,
+    EMPTY = "EMPTY",
+    BLACK = "BLACK",
+    WHITE = "WHITE",
 }

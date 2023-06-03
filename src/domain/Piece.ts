@@ -1,6 +1,6 @@
-import { Cell, Color } from "./Cell";
+import { Type, Color } from "./Cell";
 
 export class Piece{
     Color: Color = Color.EMPTY;
-    Cell: Cell = Cell.EMPTY;
+    Type: Type = Type.EMPTY;
 }

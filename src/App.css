@@ -4,8 +4,8 @@
 }
 
 .chess-background{
-  width: 1000px;
-  height: 1000px;
+  width: 800px;
+  height: 800px;
   background-color: rgb(202, 135, 0);
   margin: 0;
   position: absolute;
@@ -45,4 +45,32 @@
   width: 12.5%;
   height: 100%;
   float: left;
+}
+
+.black-green{
+  background-color: rgb(39, 72, 40);
+  width: 12.5%;
+  height: 100%;
+  float: left;
+}
+
+.white-green{
+  background-color: rgb(139, 255, 141);
+  width: 12.5%;
+  height: 100%;
+  float: left;
+}
+
+@media screen and (max-width: 900px){
+  .chess-background{
+    width: 600px;
+    height: 600px;
+  }
+}
+
+@media screen and (max-width: 650px){
+  .chess-background{
+    width: 400px;
+    height: 400px;
+  }
 }
