@@ -79,6 +79,12 @@ function App() {
     else if(piece.Type === Type.QUEEN){
       possibilities = getPossibilitiesForQueen(piece, location);
     }
+    else if(piece.Type === Type.KING){
+      possibilities = getPossibilitiesForKing(piece, location);
+    }
+    else if(piece.Type === Type.PAWN){
+      possibilities = getPossibilitiesForPawn(piece, location);
+    }
 
     return possibilities;
   }
@@ -391,6 +397,58 @@ function App() {
         possibilities.push(currentLocation);
       }
     }
+
+    return possibilities;
+  }
+
+  const getPossibilitiesForKing = (piece: Piece, location: Location) : Location[] => {
+    let possibilities: Location[] = [];
+
+    const y: number = location.row;
+    const x: number = location.collumn;
+    const color: Color = piece.Color;
+
+    possibilities.push(new Location(y ,x + 1));
+    possibilities.push(new Location(y + 1, x + 1));
+    possibilities.push(new Location(y - 1, x + 1));
+    possibilities.push(new Location(y, x - 1));
+    possibilities.push(new Location(y + 1, x - 1));
+    possibilities.push(new Location(y - 1, x - 1));
+    possibilities.push(new Location(y + 1, x));
+    possibilities.push(new Location( y - 1, x));
+
+    possibilities = possibilities.filter((loc:Location) => {
+      return loc.collumn >= 0 && loc.collumn <= 7 && loc.row >= 0 && loc.row <=7 && board[loc.row][loc.collumn].Color !== color
+    });
+
+    return possibilities;
+  }
+
+  const getPossibilitiesForPawn = (piece: Piece, location: Location) : Location[] => {
+    let possibilities: Location[] = [];
+    
+    const y: number = location.row;
+    const x: number = location.collumn;
+    const color: Color = piece.Color;
+    const direction: number = color === Color.BLACK ? 1 : -1;
+
+    if(color === Color.BLACK && y === 1 && board[2][x].Type === Type.EMPTY && board[3][x].Type === Type.EMPTY){
+      possibilities.push(new Location(3, x));
+    }
+    if(color === Color.WHITE && y === 6 && board[5][x].Type === Type.EMPTY && board[4][x].Type === Type.EMPTY){
+      possibilities.push(new Location(4, x));
+    }
+
+    if(x + 1 <= 7 && board[y+direction][x+1].Color !== color && board[y+direction][x+1].Color !== Color.EMPTY){
+      possibilities.push(new Location(y+direction, x+1));
+    }
+    if(x - 1 >= 0 && board[y+direction][x-1].Color !== color && board[y+direction][x-1].Color !== Color.EMPTY){
+      possibilities.push(new Location(y+direction, x-1));
+    }
+    if(y <= 7 && y >= 0 && board[y+direction][x].Color === Color.EMPTY){
+      possibilities.push(new Location(y+direction, x));
+    }
+
 
     return possibilities;
   }
