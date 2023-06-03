@@ -24,7 +24,7 @@ const gameBeginning: Piece[][] = [
   [BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
   [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, WHITE_QUEEN, EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
@@ -55,7 +55,6 @@ function App() {
     const piece: Piece = structuredClone(board[row][collumn]);
     const location: Location = new Location(row, collumn);
     
-
     const possibilities: Location[] = getAllPossibilitiesByTypeAndLocation(piece, location);
 
     let possibilitiesStrings: string[] = possibilities.map((loc: Location) => {
@@ -445,7 +444,7 @@ function App() {
     if(x - 1 >= 0 && board[y+direction][x-1].Color !== color && board[y+direction][x-1].Color !== Color.EMPTY){
       possibilities.push(new Location(y+direction, x-1));
     }
-    if(y <= 7 && y >= 0 && board[y+direction][x].Color === Color.EMPTY){
+    if(y + direction <= 7 && y + direction >= 0 && board[y+direction][x].Color === Color.EMPTY){
       possibilities.push(new Location(y+direction, x));
     }
 
