@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { Type, Color } from './domain/Cell';
 import './App.css';
 import { Piece } from './domain/Piece';
@@ -73,8 +73,6 @@ function App() {
 
   const getAllPossibilitiesByTypeAndLocation = (piece: Piece, location: Location) => {
     let possibilities: Location[] = [];
-
-
     
     if(piece.Type !== Type.EMPTY && turn === piece.Color){
       setSelectedPiece(piece);
@@ -105,17 +103,24 @@ function App() {
 
   const isSelectedLocationAnOption = (location: Location) : boolean =>{
     const currentLocationString: string = `${location.row}-${location.collumn}`;
-
     return options.includes(currentLocationString);
   }
 
   const moveFromPieceFromLocationToLocation = (location1: Location, location2: Location): void =>{
     let updatedBoard: Piece[][] = structuredClone(board);
 
-    // @ts-ignore
-    updatedBoard[location2.row][location2.collumn] = selectedPiece;
+    if(location2.row === 0 && selectedPiece?.Type === Type.PAWN && selectedPiece?.Color === Color.WHITE){
+      updatedBoard[location2.row][location2.collumn] = new Piece(Type.QUEEN, Color.WHITE);
+    }
+    else if(location2.row === 7 && selectedPiece?.Type === Type.PAWN && selectedPiece?.Color === Color.BLACK){
+      updatedBoard[location2.row][location2.collumn] = new Piece(Type.QUEEN, Color.BLACK);
+    }
+    else{
+      // @ts-ignore
+      updatedBoard[location2.row][location2.collumn] = selectedPiece;
+    }
+    
     updatedBoard[location1.row][location1.collumn] = new Piece();
-
     setTurn(turn === Color.WHITE ? Color.BLACK : Color.WHITE);
     setBoard(updatedBoard);
   }
@@ -349,7 +354,6 @@ function App() {
     if(y + direction <= 7 && y + direction >= 0 && board[y+direction][x].Color === Color.EMPTY){
       possibilities.push(new Location(y+direction, x));
     }
-
 
     return possibilities;
   }
