@@ -24,7 +24,7 @@ const gameBeginning: Piece[][] = [
   [BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK],
   [BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
-  [EMPTY, EMPTY, EMPTY, EMPTY, WHITE_QUEEN, EMPTY, EMPTY, EMPTY],
+  [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY],
   [WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN],
@@ -39,6 +39,10 @@ class Location{
     this.row = row;
     this.collumn = collumn;
   }
+
+  equals(location: Location|undefined){
+    return location !== undefined && this.collumn === location.collumn && this.row === location.row
+  }
 }
 
 function App() {
@@ -46,46 +50,74 @@ function App() {
   const [selectedPiece, setSelectedPiece] = useState<Piece|undefined>(undefined);
   const [selectedLocation, setSelectedLocation] = useState<Location|undefined>(undefined);
   const [options, setOptions] = useState<string[]>([]);
-
-  useEffect(()=>{
-    console.log(options);
-  },[options]);
+  const [turn, setTurn] = useState<Color>(Color.WHITE);
 
   const pieceClicked = (row: number, collumn: number): void =>{
     const piece: Piece = structuredClone(board[row][collumn]);
     const location: Location = new Location(row, collumn);
     
-    const possibilities: Location[] = getAllPossibilitiesByTypeAndLocation(piece, location);
-
-    let possibilitiesStrings: string[] = possibilities.map((loc: Location) => {
-      return `${loc.row}-${loc.collumn}`;
-    });
-    
-    setOptions([...possibilitiesStrings]);
+    if(isSelectedLocationAnOption(location)){
+      // @ts-ignore
+      moveFromPieceFromLocationToLocation(selectedLocation, location);
+      setOptions([]);
+    }
+    else{
+      const possibilities: Location[] = getAllPossibilitiesByTypeAndLocation(piece, location);
+      
+      let possibilitiesStrings: string[] = possibilities.map((loc: Location) => {
+        return `${loc.row}-${loc.collumn}`;
+      }); 
+      setOptions([...possibilitiesStrings]);
+    }
   }
 
   const getAllPossibilitiesByTypeAndLocation = (piece: Piece, location: Location) => {
     let possibilities: Location[] = [];
-    if(piece.Type === Type.ROOK){
-      possibilities = getPossibilitiesForRook(piece, location);
-    }
-    else if(piece.Type === Type.KNIGHT){
-      possibilities = getPossibilitiesForKnight(piece, location);
-    }
-    else if(piece.Type === Type.BISHOP){
-      possibilities = getPossibilitiesForBishop(piece, location);
-    }
-    else if(piece.Type === Type.QUEEN){
-      possibilities = getPossibilitiesForQueen(piece, location);
-    }
-    else if(piece.Type === Type.KING){
-      possibilities = getPossibilitiesForKing(piece, location);
-    }
-    else if(piece.Type === Type.PAWN){
-      possibilities = getPossibilitiesForPawn(piece, location);
-    }
 
+
+    
+    if(piece.Type !== Type.EMPTY && turn === piece.Color){
+      setSelectedPiece(piece);
+      setSelectedLocation(location);
+    
+      if(piece.Type === Type.ROOK){
+        possibilities = getPossibilitiesForRook(piece, location);
+      }
+      else if(piece.Type === Type.KNIGHT){
+        possibilities = getPossibilitiesForKnight(piece, location);
+      }
+      else if(piece.Type === Type.BISHOP){
+        possibilities = getPossibilitiesForBishop(piece, location);
+      }
+      else if(piece.Type === Type.QUEEN){
+        possibilities = getPossibilitiesForQueen(piece, location);
+      }
+      else if(piece.Type === Type.KING){
+        possibilities = getPossibilitiesForKing(piece, location);
+      }
+      else if(piece.Type === Type.PAWN){
+        possibilities = getPossibilitiesForPawn(piece, location);
+      }
+    }
+    
     return possibilities;
+  }
+
+  const isSelectedLocationAnOption = (location: Location) : boolean =>{
+    const currentLocationString: string = `${location.row}-${location.collumn}`;
+
+    return options.includes(currentLocationString);
+  }
+
+  const moveFromPieceFromLocationToLocation = (location1: Location, location2: Location): void =>{
+    let updatedBoard: Piece[][] = structuredClone(board);
+
+    // @ts-ignore
+    updatedBoard[location2.row][location2.collumn] = selectedPiece;
+    updatedBoard[location1.row][location1.collumn] = new Piece();
+
+    setTurn(turn === Color.WHITE ? Color.BLACK : Color.WHITE);
+    setBoard(updatedBoard);
   }
 
   const getPossibilitiesForRook = (piece: Piece, location: Location) : Location[] => {
@@ -264,138 +296,8 @@ function App() {
   const getPossibilitiesForQueen = (piece: Piece, location: Location) : Location[] => {
     let possibilities: Location[] = [];
 
-    const y: number = location.row;
-    const x: number = location.collumn;
-    const color: Color = piece.Color;
-
-    for(let i = x+1; i < 8; i++){
-      let difference = i - x;
-
-      if(difference + x > 7 || difference + y > 7)
-        break;
-      const currentCell: Piece = board[difference + y][difference + x];
-      const currentLocation: Location = new Location(difference + y, difference + x);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = x+1; i < 8; i++){
-      let difference = i - x;
-
-      if(difference + x > 7 || y - difference < 0)
-        break;
-      const currentCell: Piece = board[y - difference][difference + x];
-      const currentLocation: Location = new Location(y - difference, difference + x);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = x-1; i >= 0; i--){
-      let difference = x - i;
-
-      if(x - difference < 0 || difference + y > 7)
-        break;
-      const currentCell: Piece = board[difference + y][x - difference];
-      const currentLocation: Location = new Location(difference + y, x - difference);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = x-1; i >= 0; i--){
-      let difference = x - i;
-
-      if(x - difference < 0 ||  y - difference < 0)
-        break;
-      const currentCell: Piece = board[y - difference][x - difference];
-      const currentLocation: Location = new Location(y - difference, x - difference);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = y - 1; i >= 0; i--){
-      const currentCell: Piece = board[i][x];
-      const currentLocation = new Location(i, x);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = y + 1; i < 8; i++){
-      const currentCell: Piece = board[i][x];
-      const currentLocation = new Location(i, x);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = x - 1; i >= 0; i--){
-      const currentCell: Piece = board[y][i];
-      const currentLocation = new Location(y, i);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
-    for(let i = x + 1; i < 8; i++){
-      const currentCell: Piece = board[y][i];
-      const currentLocation = new Location(y, i);
-      if(currentCell.Color === color){
-        break;
-      }
-      else if(currentCell.Type !== Type.EMPTY){
-        possibilities.push(currentLocation);
-        break;
-      }
-      else{
-        possibilities.push(currentLocation);
-      }
-    }
+    possibilities.push(...getPossibilitiesForRook(piece,location));
+    possibilities.push(...getPossibilitiesForBishop(piece,location));
 
     return possibilities;
   }
