@@ -1,3 +1,6 @@
+![image](https://github.com/TheGreatMahan/Chess/assets/76800871/2754fd87-cf46-4d98-b93c-0abad53a659c)
+![image](https://github.com/TheGreatMahan/Chess/assets/76800871/a565fdda-fe3e-4010-9a79-c59d1fe15621)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
