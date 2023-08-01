@@ -52,6 +52,13 @@ function App() {
   const [options, setOptions] = useState<string[]>([]);
   const [turn, setTurn] = useState<Color>(Color.WHITE);
 
+  const [whiteKingMoved, setWhiteKingMoved] = useState<boolean>(false);
+  const [blackKingMoved, setBlackKingMoved] = useState<boolean>(false);
+  const [blackLeftrookMoved, setBlackLeftrookMoved] = useState<boolean>(false);
+  const [blackRightrookMoved, setBlackRightrookMoved] = useState<boolean>(false);
+  const [whiteLeftrookMoved, setWhiteLeftrookMoved] = useState<boolean>(false);
+  const [whiteRightrookMoved, setWhiteRightrookMoved] = useState<boolean>(false);
+
   const pieceClicked = (row: number, collumn: number): void =>{
     const piece: Piece = structuredClone(board[row][collumn]);
     const location: Location = new Location(row, collumn);
@@ -360,7 +367,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className='chess-background'>
+      <div className={`chess-background-${turn === Color.WHITE ? 'white' : 'black'}`}>
         <div className='chess-board'>
           {
             board.map((row: Piece[], rowNumber: number) => {
