@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Type, Color } from './domain/Cell';
 import './App.css';
 import { Piece } from './domain/Piece';
@@ -59,6 +59,11 @@ function App() {
   const [whiteLeftrookMoved, setWhiteLeftrookMoved] = useState<boolean>(false);
   const [whiteRightrookMoved, setWhiteRightrookMoved] = useState<boolean>(false);
 
+  const [enpassantLocation, setEnpassantLocation] = useState<Location | undefined>(undefined);
+  const [enpassantColor, setEnpassantColor] = useState<Color|undefined>(undefined);
+
+  useEffect(()=>{console.log(enpassantLocation)},[enpassantLocation])
+
   const pieceClicked = (row: number, collumn: number): void =>{
     const piece: Piece = structuredClone(board[row][collumn]);
     const location: Location = new Location(row, collumn);
@@ -116,6 +121,10 @@ function App() {
   const moveFromPieceFromLocationToLocation = (location1: Location, location2: Location): void =>{
     let updatedBoard: Piece[][] = structuredClone(board);
 
+    let enpassant: Location | undefined = enpassantLocation;
+    let enpsntColor: Color | undefined = enpassantColor;
+    setEnpassantLocation(undefined);
+
     if(location2.row === 0 && selectedPiece?.Type === Type.PAWN && selectedPiece?.Color === Color.WHITE){
       updatedBoard[location2.row][location2.collumn] = new Piece(Type.QUEEN, Color.WHITE);
     }
@@ -142,6 +151,19 @@ function App() {
         }
         else{
           location1.collumn === 0 ? setBlackLeftrookMoved(true) : setBlackRightrookMoved(true);
+        }
+      }
+      if(selectedPiece?.Type === Type.PAWN){
+        if(selectedPiece?.Color === Color.WHITE && location2.row === location1.row - 2){
+          setEnpassantLocation(new Location(location1.row - 1, location2.collumn));
+          setEnpassantColor(selectedPiece.Color);
+        }
+        if(selectedPiece?.Color === Color.BLACK && location2.row === location1.row + 2){
+          setEnpassantLocation(new Location(location1.row + 1, location2.collumn));
+          setEnpassantColor(selectedPiece.Color);
+        }
+        if(location2.equals(enpassant)){
+          updatedBoard[location2.row + (enpsntColor === Color.BLACK ? 1 : -1)][location2.collumn] = new Piece();
         }
       }
 
@@ -390,11 +412,11 @@ function App() {
       possibilities.push(new Location(4, x));
     }
 
-    if(x + 1 <= 7 && board[y+direction][x+1].Color !== color && board[y+direction][x+1].Color !== Color.EMPTY){
-      possibilities.push(new Location(y+direction, x+1));
+    if((x + 1 <= 7 && board[y+direction][x+1].Color !== color && board[y+direction][x+1].Color !== Color.EMPTY) || (enpassantLocation && enpassantLocation.equals(new Location(y+direction, x+1)))){
+      possibilities.push(new Location(y+direction, x + 1));
     }
-    if(x - 1 >= 0 && board[y+direction][x-1].Color !== color && board[y+direction][x-1].Color !== Color.EMPTY){
-      possibilities.push(new Location(y+direction, x-1));
+    if((x - 1 >= 0 && board[y+direction][x-1].Color !== color && board[y+direction][x-1].Color !== Color.EMPTY) || (enpassantLocation && enpassantLocation.equals(new Location(y+direction, x-1)))){
+      possibilities.push(new Location(y+direction, x - 1));
     }
     if(y + direction <= 7 && y + direction >= 0 && board[y+direction][x].Color === Color.EMPTY){
       possibilities.push(new Location(y+direction, x));
