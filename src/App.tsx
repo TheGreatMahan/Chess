@@ -123,6 +123,28 @@ function App() {
       updatedBoard[location2.row][location2.collumn] = new Piece(Type.QUEEN, Color.BLACK);
     }
     else{
+      //this is for castling
+      if(selectedPiece?.Type === Type.KING){
+        selectedPiece?.Color === Color.WHITE ? setWhiteKingMoved(true) : setBlackKingMoved(true);
+
+        if(location2.collumn === location1.collumn + 2){
+          updatedBoard[location1.row][location1.collumn + 1] = updatedBoard[location1.row][7];
+          updatedBoard[location1.row][7] = new Piece();
+        }
+        if(location2.collumn === location1.collumn - 2){
+          updatedBoard[location1.row][location1.collumn - 1] = updatedBoard[location1.row][0];
+          updatedBoard[location1.row][0] = new Piece();
+        }
+      }
+      if(selectedPiece?.Type === Type.ROOK){
+        if(selectedPiece?.Color === Color.WHITE){
+          location1.collumn === 0 ? setWhiteLeftrookMoved(true) : setWhiteRightrookMoved(true);
+        }
+        else{
+          location1.collumn === 0 ? setBlackLeftrookMoved(true) : setBlackRightrookMoved(true);
+        }
+      }
+
       // @ts-ignore
       updatedBoard[location2.row][location2.collumn] = selectedPiece;
     }
@@ -329,6 +351,22 @@ function App() {
     possibilities.push(new Location(y - 1, x - 1));
     possibilities.push(new Location(y + 1, x));
     possibilities.push(new Location( y - 1, x));
+    if(color === Color.WHITE && !whiteKingMoved){
+      if(!whiteLeftrookMoved && board[7][1].Type === Type.EMPTY && board[7][2].Type === Type.EMPTY && board[7][3].Type === Type.EMPTY){
+        possibilities.push(new Location(7, 2));
+      }
+      if(!whiteRightrookMoved && board[7][5].Type === Type.EMPTY && board[7][6].Type === Type.EMPTY){
+        possibilities.push(new Location(7, 6));
+      }
+    }
+    if(color === Color.BLACK && !blackKingMoved){
+      if(!blackLeftrookMoved && board[0][1].Type === Type.EMPTY && board[0][2].Type === Type.EMPTY && board[0][3].Type === Type.EMPTY){
+        possibilities.push(new Location(0, 2));
+      }
+      if(!blackRightrookMoved && board[0][5].Type === Type.EMPTY && board[0][6].Type === Type.EMPTY){
+        possibilities.push(new Location(0, 6));
+      }
+    }
 
     possibilities = possibilities.filter((loc:Location) => {
       return loc.collumn >= 0 && loc.collumn <= 7 && loc.row >= 0 && loc.row <=7 && board[loc.row][loc.collumn].Color !== color
